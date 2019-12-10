@@ -7,13 +7,14 @@ module Administrate
       resources = Administrate::Search.new(scoped_resource,
                                            dashboard_class,
                                            search_term).run
+      resources = decorate_resource(resources)
       resources = apply_collection_includes(resources)
       resources = order.apply(resources)
       resources = resources.page(params[:page]).per(records_per_page)
       page = Administrate::Page::Collection.new(dashboard, order: order)
 
       render locals: {
-        resources: resources,
+        resources: decorate_resource(resources),
         search_term: search_term,
         page: page,
         show_search_bar: show_search_bar?,
@@ -112,9 +113,11 @@ module Administrate
     end
 
     def requested_resource
-      @requested_resource ||= find_resource(params[:id]).tap do |resource|
-        authorize_resource(resource)
-      end
+      @requested_resource ||= decorate_resource(
+        find_resource(params[:id]).tap do |resource|
+          authorize_resource(resource)
+        end
+      )
     end
 
     def find_resource(param)
@@ -183,6 +186,10 @@ module Administrate
     helper_method :new_resource
 
     def authorize_resource(resource)
+      resource
+    end
+
+    def decorate_resource(resource)
       resource
     end
   end
