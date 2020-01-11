@@ -5,9 +5,21 @@ module Administrate
     end
 
     def resources
-      @resources ||= routes.map(&:first).uniq.map do |path|
-        Resource.new(namespace, path)
+      return @resources if @resources
+
+      _resources = {}
+      _path = 0
+      _action = 1
+      routes.each do |route|
+        if _resources[route[_path]].present?
+          _resources[route[_path]].actions << route[_action]
+        else
+          _resources[route[_path]] =
+            Resource.new(namespace, route[_path], [route[_action]])
+        end
       end
+
+      @resources = _resources.values
     end
 
     def routes

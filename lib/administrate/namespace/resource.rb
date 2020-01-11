@@ -1,11 +1,12 @@
 module Administrate
   class Namespace
     class Resource
-      attr_reader :namespace, :resource
+      attr_reader :namespace, :resource, :actions
 
-      def initialize(namespace, resource)
+      def initialize(namespace, resource, actions = [])
         @namespace = namespace
         @resource = resource
+        @actions = Set.new(actions)
       end
 
       def to_s
